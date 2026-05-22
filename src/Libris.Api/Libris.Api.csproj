@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Libris.Core\Libris.Core.csproj" />
+    <ProjectReference Include="..\Libris.Storage\Libris.Storage.csproj" />
+    <ProjectReference Include="..\Libris.Epub\Libris.Epub.csproj" />
+    <ProjectReference Include="..\Libris.Metadata\Libris.Metadata.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>

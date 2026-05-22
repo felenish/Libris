@@ -1,0 +1,53 @@
+# ── .NET ──────────────────────────────────────────────────────────────────────
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+_ReSharper*/
+*.ReSharper
+*.DotSettings.user
+
+# NuGet
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# EF Core migrations bundle
+efbundle*
+
+# ── Desktop app data (runtime-generated, never commit) ────────────────────────
+src/Libris.Desktop/wwwroot/
+
+# ── React / Node ──────────────────────────────────────────────────────────────
+ui/libris-ui/node_modules/
+ui/libris-ui/dist/
+ui/libris-ui/.env
+ui/libris-ui/.env.local
+ui/libris-ui/.env.*.local
+
+# ── Test output ───────────────────────────────────────────────────────────────
+TestResults/
+coverage/
+*.trx
+*.coverage
+*.coveragexml
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Libris runtime data (AppData — not in repo) ───────────────────────────────
+*.db
+*.db-shm
+*.db-wal

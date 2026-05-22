@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Libris.Api/Libris.Api.csproj" />
+    <Project Path="src/Libris.Core/Libris.Core.csproj" />
+    <Project Path="src/Libris.Desktop/Libris.Desktop.csproj" />
+    <Project Path="src/Libris.Epub/Libris.Epub.csproj" />
+    <Project Path="src/Libris.Metadata/Libris.Metadata.csproj" />
+    <Project Path="src/Libris.Storage/Libris.Storage.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Libris.Core.Tests/Libris.Core.Tests.csproj" />
+    <Project Path="tests/Libris.Epub.Tests/Libris.Epub.Tests.csproj" />
+    <Project Path="tests/Libris.Storage.Tests/Libris.Storage.Tests.csproj" />
+  </Folder>
+</Solution>

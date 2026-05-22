@@ -6,27 +6,27 @@
 
 ## Phase 1 — Solution Setup
 
-- [ ] Create `Libris.sln` and directory structure (`src/`, `ui/`, `tests/`)
-- [ ] Create `Libris.Core` class library (`net10.0`)
-- [ ] Create `Libris.Storage` class library (`net10.0`)
-- [ ] Create `Libris.Epub` class library (`net10.0`)
-- [ ] Create `Libris.Metadata` class library (`net10.0`)
-- [ ] Create `Libris.Api` ASP.NET Core Web API project (`net10.0`)
-- [ ] Create `Libris.Desktop` WPF project (`net10.0-windows`)
-- [ ] Create `Libris.Core.Tests` xUnit project
-- [ ] Create `Libris.Storage.Tests` xUnit project
-- [ ] Create `Libris.Epub.Tests` xUnit project
-- [ ] Add project references: Storage/Epub/Metadata/Api → Core; Api → Storage + Epub + Metadata; Desktop → Api
-- [ ] Enable `<Nullable>enable</Nullable>` and `<ImplicitUsings>enable</ImplicitUsings>` in all C# projects
-- [ ] Add `.editorconfig` with Roslyn analyzer rules
-- [ ] Install `Microsoft.EntityFrameworkCore.Sqlite` + `Microsoft.EntityFrameworkCore.Design` in Storage
-- [ ] Install `VersOne.Epub` NuGet package in Libris.Epub
-- [ ] Install `Microsoft.AspNetCore.OpenApi` and `Swashbuckle.AspNetCore` in Libris.Api
-- [ ] Install `Microsoft.Web.WebView2` in Libris.Desktop
-- [ ] Install `dotnet-ef` global tool
-- [ ] Scaffold `ui/libris-ui` with `npm create vite@latest` (React + TypeScript)
-- [ ] Configure Vite `build.outDir` to `../../src/Libris.Desktop/wwwroot`
-- [ ] Verify solution builds clean with no warnings
+- [x] Create `Libris.slnx` and directory structure (`src/`, `ui/`, `tests/`)
+- [x] Create `Libris.Core` class library (`net10.0`)
+- [x] Create `Libris.Storage` class library (`net10.0`)
+- [x] Create `Libris.Epub` class library (`net10.0`)
+- [x] Create `Libris.Metadata` class library (`net10.0`)
+- [x] Create `Libris.Api` ASP.NET Core Web API project (`net10.0`)
+- [x] Create `Libris.Desktop` WPF project (`net10.0-windows`)
+- [x] Create `Libris.Core.Tests` xUnit project
+- [x] Create `Libris.Storage.Tests` xUnit project
+- [x] Create `Libris.Epub.Tests` xUnit project
+- [x] Add project references: Storage/Epub/Metadata/Api → Core; Api → Storage + Epub + Metadata; Desktop → Api
+- [x] Enable `<Nullable>enable</Nullable>` and `<ImplicitUsings>enable</ImplicitUsings>` in all C# projects
+- [x] Add `.editorconfig` with Roslyn analyzer rules
+- [x] Install `Microsoft.EntityFrameworkCore.Sqlite` + `Microsoft.EntityFrameworkCore.Design` in Storage
+- [x] Install `VersOne.Epub` NuGet package in Libris.Epub
+- [x] Install `Microsoft.Web.WebView2` in Libris.Desktop
+- [x] Install `dotnet-ef` global tool
+- [x] Scaffold `ui/libris-ui` with `npm create vite@latest` (React + TypeScript)
+- [x] Install `@tanstack/react-query`, `zustand`, `framer-motion`, `epubjs`
+- [x] Configure Vite `build.outDir` to `../../src/Libris.Desktop/wwwroot`
+- [x] Verify solution builds clean with no warnings (`dotnet build` 0 errors, 0 warnings)
 
 ---
 
