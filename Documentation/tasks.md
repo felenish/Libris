@@ -70,14 +70,14 @@
 
 ## Phase 4 — EPUB Parser
 
-- [ ] Implement `EpubParser : IEpubParser` in `Libris.Epub`
-- [ ] `ExtractMetadataAsync` — map OPF title, authors, ISBN, language, publisher, published date, description; extract series via Calibre custom OPF tags if present
-- [ ] `ExtractCoverAsync` — locate cover image in EPUB manifest, return raw bytes; return `null` if not found
-- [ ] `GetResourceAsync` — open EPUB ZIP, locate resource by path, return bytes + MIME type
-- [ ] `GetSpineAsync` — return ordered `SpineItem` list (href, media type, title)
-- [ ] Implement `ContentTypeExtensions.ToMimeString()` — maps `VersOne.Epub` enum to MIME type strings
-- [ ] Handle EPUB files with no cover gracefully (return `null`)
-- [ ] Handle malformed OPF metadata without throwing (return empty/default values)
+- [x] Implement `EpubParser : IEpubParser` in `Libris.Epub`
+- [x] `ExtractMetadataAsync` — map OPF title, authors, ISBN, language, publisher, published date, description; extract series via Calibre custom OPF tags if present
+- [x] `ExtractCoverAsync` — locate cover image in EPUB manifest, return raw bytes; return `null` if not found
+- [x] `GetResourceAsync` — open EPUB ZIP, locate resource by path, return bytes + MIME type
+- [x] `GetSpineAsync` — return ordered `SpineItem` list (href, media type, title)
+- [x] Use `EpubContentFile.ContentMimeType` directly — no enum-to-string mapping needed (VersOne.Epub 3.3.6 exposes MIME type from OPF manifest)
+- [x] Handle EPUB files with no cover gracefully (return `null`)
+- [x] Handle malformed OPF metadata without throwing (return empty/default values)
 
 ---
 
