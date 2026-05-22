@@ -11,8 +11,8 @@ public sealed class EpubParser : IEpubParser
     {
         try
         {
-            var book = await EpubReader.ReadBookAsync(filePath);
-            var meta = book.Schema.Package.Metadata;
+            using var bookRef = await EpubReader.OpenBookAsync(filePath);
+            var meta = bookRef.Schema.Package.Metadata;
 
             var isbn = meta.Identifiers.FirstOrDefault(i =>
                 string.Equals(i.Scheme, "isbn", StringComparison.OrdinalIgnoreCase) ||
@@ -29,8 +29,8 @@ public sealed class EpubParser : IEpubParser
 
             return new BookMetadata
             {
-                Title = book.Title ?? string.Empty,
-                Authors = book.AuthorList?.ToList() ?? [],
+                Title = bookRef.Title ?? string.Empty,
+                Authors = bookRef.AuthorList?.ToList() ?? [],
                 SeriesName = string.IsNullOrWhiteSpace(seriesName) ? null : seriesName,
                 SeriesIndex = seriesIndex,
                 Genres = meta.Subjects.Select(s => s.Subject).Where(s => !string.IsNullOrWhiteSpace(s)).ToList()!,
@@ -51,8 +51,10 @@ public sealed class EpubParser : IEpubParser
     {
         try
         {
-            var book = await EpubReader.ReadBookAsync(filePath);
-            return book.Content.Cover?.Content;
+            using var bookRef = await EpubReader.OpenBookAsync(filePath);
+            var coverRef = bookRef.Content.Cover;
+            if (coverRef is null) return null;
+            return await coverRef.ReadContentAsync();
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -65,28 +67,20 @@ public sealed class EpubParser : IEpubParser
     {
         try
         {
-            var book = await EpubReader.ReadBookAsync(filePath);
-            var allFiles = book.Content.AllFiles;
+            using var bookRef = await EpubReader.OpenBookAsync(filePath);
+            var allFiles = bookRef.Content.AllFiles;
 
-            // Try exact FilePath match first, then case-insensitive fallback
-            if (!allFiles.TryGetLocalFileByFilePath(resourcePath, out var file))
+            if (!allFiles.TryGetLocalFileRefByFilePath(resourcePath, out var fileRef))
             {
-                file = allFiles.Local.FirstOrDefault(f =>
+                fileRef = allFiles.Local.FirstOrDefault(f =>
                     f.FilePath.Equals(resourcePath, StringComparison.OrdinalIgnoreCase));
             }
 
-            if (file is null) return null;
+            if (fileRef is null) return null;
 
-            var mimeType = file.ContentMimeType ?? "application/octet-stream";
-
-            byte[] content = file switch
-            {
-                EpubLocalByteContentFile byteFile => byteFile.Content ?? [],
-                EpubLocalTextContentFile textFile => Encoding.UTF8.GetBytes(textFile.Content ?? string.Empty),
-                _ => [],
-            };
-
-            return new EpubResourceResult(content, mimeType);
+            var mimeType = fileRef.ContentMimeType ?? "application/octet-stream";
+            var content = await fileRef.ReadContentAsBytesAsync();
+            return new EpubResourceResult(content ?? [], mimeType);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -99,8 +93,9 @@ public sealed class EpubParser : IEpubParser
     {
         try
         {
-            var book = await EpubReader.ReadBookAsync(filePath);
-            return book.ReadingOrder
+            using var bookRef = await EpubReader.OpenBookAsync(filePath);
+            var readingOrder = await bookRef.GetReadingOrderAsync();
+            return readingOrder
                 .Select(item => new SpineItem(
                     Href: item.FilePath,
                     MediaType: item.ContentMimeType ?? "application/xhtml+xml",

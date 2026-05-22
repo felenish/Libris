@@ -4,7 +4,19 @@
       "Bash(Select-Object Name)",
       "Bash(dotnet build *)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(dotnet add *)",
+      "Bash(dotnet remove *)",
+      "Bash(dotnet package *)",
+      "Bash(dotnet ef *)",
+      "Bash(find ~/.nuget/packages/versone.epub/3.3.6 -name \"*.xml\" | head -3 && find ~/.nuget/packages/versone.epub/3.3.6 -name \"VersOne.Epub.dll\" | head -1)",
+      "Read(//c/Users/ScottMorgan/.nuget/packages/versone.epub/3.3.6/**)",
+      "Bash(find ~/.nuget/packages/versone.epub -name \"*.epub\" 2>/dev/null | head -5; ls c:/Projects/Libris/tests/Libris.Epub.Tests/)",
+      "Read(//c/Users/ScottMorgan/.nuget/packages/versone.epub/**)",
+      "Bash(dotnet test *)",
+      "Bash(dotnet run *)",
+      "Bash(dotnet /tmp/EpubProbe/bin/Debug/net10.0/EpubProbe.dll)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\ScottMorgan\\\\.nuget\\\\packages\\\\versone.epub\\\\3.3.6\\\\\" -Recurse -File | Select-Object -ExpandProperty FullName | head -30)"
     ]
   }
 }
