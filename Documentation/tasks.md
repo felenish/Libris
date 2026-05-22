@@ -32,20 +32,20 @@
 
 ## Phase 2 — Domain Models
 
-- [ ] Implement `EpubBook` sealed class in `Libris.Core`
-- [ ] Implement `BookMetadata` sealed class
-- [ ] Implement `ReadingProgress` sealed class
-- [ ] Implement `ReadingStatus` enum (`NotStarted`, `Reading`, `Finished`)
-- [ ] Implement `SpineItem` record/DTO
-- [ ] Implement `ExternalBookMetadata` DTO
-- [ ] Implement `EpubResourceResult` record (`Content`, `MediaType`)
-- [ ] Define `ILibraryRepository` interface
-- [ ] Define `IReadingProgressRepository` interface
-- [ ] Define `IEpubParser` interface
-- [ ] Define `IMetadataProvider` interface
-- [ ] Define `IShellService` interface (`OpenFileDialogAsync`, `OpenFolderDialogAsync`, `RevealInExplorerAsync`)
-- [ ] Define `ICoverCacheManager` interface (`SaveCoverAsync`, `GetCoverPathAsync`, `DeleteCoverAsync`)
-- [ ] Verify `Libris.Core` has zero non-system dependencies
+- [x] Implement `EpubBook` sealed class in `Libris.Core`
+- [x] Implement `BookMetadata` sealed class
+- [x] Implement `ReadingProgress` sealed class
+- [x] Implement `ReadingStatus` enum (`NotStarted`, `Reading`, `Finished`)
+- [x] Implement `SpineItem` record/DTO
+- [x] Implement `ExternalBookMetadata` DTO
+- [x] Implement `EpubResourceResult` record (`Content`, `MediaType`)
+- [x] Define `ILibraryRepository` interface
+- [x] Define `IReadingProgressRepository` interface
+- [x] Define `IEpubParser` interface
+- [x] Define `IMetadataProvider` interface
+- [x] Define `IShellService` interface (`OpenFileDialogAsync`, `OpenFolderDialogAsync`, `RevealInExplorerAsync`)
+- [x] Define `ICoverCacheManager` interface (`SaveCoverAsync`, `GetCoverPathAsync`, `DeleteCoverAsync`)
+- [x] Verify `Libris.Core` has zero non-system dependencies
 
 ---
 
