@@ -51,18 +51,18 @@
 
 ## Phase 3 — Database Setup
 
-- [ ] Create `EpubBookEntity` EF entity class in `Libris.Storage`
-- [ ] Create `ReadingProgressEntity` EF entity class
-- [ ] Implement `LibrisDbContext : DbContext` with `DbSet<EpubBookEntity>` and `DbSet<ReadingProgressEntity>`
-- [ ] Add `IEntityTypeConfiguration<EpubBookEntity>` — configure PK, column types, `AuthorsJson`, `GenresJson`
-- [ ] Add `IEntityTypeConfiguration<ReadingProgressEntity>` — configure FK, cascade delete
-- [ ] Create `LibrisDataPaths` static class — resolves `%AppData%\Libris\` database and covers paths
-- [ ] Ensure data directory and covers subdirectory are created on first access
-- [ ] Implement `LibraryRepository : ILibraryRepository` — maps between entity and domain; all methods async
-- [ ] Implement `ReadingProgressRepository : IReadingProgressRepository` — upsert on `SaveProgressAsync`
-- [ ] Implement `CoverCacheManager : ICoverCacheManager` — write JPEG, resize to 400×600 at 85% quality
-- [ ] Add `SixLabors.ImageSharp` NuGet for cover resizing
-- [ ] Create initial EF Core migration (`InitialCreate`)
+- [x] Create `EpubBookEntity` EF entity class in `Libris.Storage`
+- [x] Create `ReadingProgressEntity` EF entity class
+- [x] Implement `LibrisDbContext : DbContext` with `DbSet<EpubBookEntity>` and `DbSet<ReadingProgressEntity>`
+- [x] Add `IEntityTypeConfiguration<EpubBookEntity>` — configure PK, column types, `AuthorsJson`, `GenresJson`
+- [x] Add `IEntityTypeConfiguration<ReadingProgressEntity>` — configure FK, cascade delete
+- [x] Create `LibrisDataPaths` static class — resolves `%AppData%\Libris\` database and covers paths
+- [x] Ensure data directory and covers subdirectory are created on first access
+- [x] Implement `LibraryRepository : ILibraryRepository` — maps between entity and domain; all methods async
+- [x] Implement `ReadingProgressRepository : IReadingProgressRepository` — upsert on `SaveProgressAsync`
+- [x] Implement `CoverCacheManager : ICoverCacheManager` — resize to fit within 400×600 (preserve aspect ratio), save as JPEG 85% quality using `System.Drawing`
+- [x] Target `net10.0-windows` in `Libris.Storage` — unlocks `System.Drawing` (GDI+), no external image package needed
+- [x] Create initial EF Core migration (`InitialCreate`)
 - [ ] Apply migration programmatically on startup (`context.Database.MigrateAsync()`)
 - [ ] Write `LibrisDataPaths` unit test
 

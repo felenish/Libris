@@ -11,9 +11,9 @@ indent_style = space
 indent_size = 4
 
 # Roslyn severity overrides
-dotnet_diagnostic.CA1062.severity = warning   # Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = none      # NRT already enforces non-null at compile time
 dotnet_diagnostic.CA1031.severity = suggestion # Do not catch general exception types
-dotnet_diagnostic.CA2007.severity = warning   # ConfigureAwait
+dotnet_diagnostic.CA2007.severity = none      # ConfigureAwait not needed in ASP.NET Core (no sync context)
 dotnet_diagnostic.CS8600.severity = error     # Nullability warnings treated as errors
 dotnet_diagnostic.CS8601.severity = error
 dotnet_diagnostic.CS8602.severity = error

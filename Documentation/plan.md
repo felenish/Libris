@@ -64,7 +64,7 @@ Implement `Libris.Storage`: EF Core context, entity types, entity configurations
 - `ReadingProgressRepository : IReadingProgressRepository`
 
 **Cover cache:**
-- `CoverCacheManager : ICoverCacheManager` — writes JPEGs to `%AppData%\Libris\covers\{id}.jpg`, resizes to 400×600 at 85% JPEG quality
+- `CoverCacheManager : ICoverCacheManager` — writes JPEGs to `%AppData%\Libris\covers\{id}.jpg`, resizes to fit within 400×600 (preserving aspect ratio) at 85% JPEG quality using `System.Drawing` (no external package — `Libris.Storage` targets `net10.0-windows` since the app is Windows-only)
 
 **Infrastructure:**
 - `LibrisDataPaths` — resolves `%AppData%\Libris\` paths for database and covers directory
