@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Layout } from './components/Layout';
 import { ShelfList } from './components/ShelfList';
 import { BookDetailPanel } from './components/BookDetailPanel';
+import { EpubReader } from './components/EpubReader';
 import { useLibrisStore } from './store/useLibrisStore';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
         <ShelfList onBookSelect={handleBookSelect} />
       </Layout>
       <BookDetailPanel bookId={selectedBookId} onClose={handleDetailClose} />
+      <EpubReader />
     </>
   );
 }

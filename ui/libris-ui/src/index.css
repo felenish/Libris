@@ -380,6 +380,168 @@ body { margin: 0; overflow: hidden; }
 }
 .btn-danger:hover { background: rgba(239, 68, 68, 0.1); }
 
+/* ── EPUB Reader ── */
+.reader-overlay {
+  position: fixed;
+  inset: 0;
+  background: #1a1a1f;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+}
+
+.reader-chrome {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.chrome-left, .chrome-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.chrome-center {
+  flex: 1;
+  text-align: center;
+  font-size: 13px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.chrome-title { color: var(--text); font-weight: 500; }
+.chrome-chapter { color: var(--text-muted); }
+
+.chrome-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.chrome-btn:hover { color: var(--text); background: var(--surface-raised); }
+.chrome-close { font-size: 16px; }
+
+.reader-body {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.reader-nav {
+  flex-shrink: 0;
+  width: 48px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 32px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.reader-nav:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+
+.reader-content {
+  flex: 1;
+  background: #fff;
+  min-width: 0;
+}
+
+.reader-progress-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  height: 24px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.reader-progress-track {
+  flex: 1;
+  height: 4px;
+  background: var(--surface-raised);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.reader-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.6s ease;
+  min-width: 2px;
+}
+.reader-progress-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  min-width: 32px;
+  text-align: right;
+}
+
+.reader-toc {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  bottom: 3px;
+  width: 280px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 10;
+  padding: 16px 0;
+}
+
+.toc-heading {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  padding: 0 20px 8px;
+  margin: 0;
+}
+
+.toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.toc-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--text);
+  padding: 8px 20px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.12s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.toc-item:hover { background: var(--surface-raised); }
+.toc-item-sub { padding-left: 36px; color: var(--text-muted); font-size: 12px; }
+
 /* ── Misc ── */
 .status-msg {
   color: var(--text-muted);

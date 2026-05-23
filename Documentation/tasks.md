@@ -170,25 +170,25 @@
 - [x] Read button sets `readerVisible = true` in Zustand store
 - [x] Remove button calls `removeBook()`, closes panel, invalidates shelves query
 - [x] Handle `fileFound = false` in `BookCard` and `BookDetailPanel` — show warning icon and "Relink" button placeholder
-- [ ] Verify browsing a library of 20+ imported EPUBs with covers is smooth
+- [x] Verify browsing a library of 20+ imported EPUBs with covers is smooth
 
 ---
 
 ## Phase 10 — EPUB Reader
 
-- [ ] Add `EpubController` to `Libris.Api` — spine endpoint and resource streaming endpoint
-- [ ] `GET /api/epub/{id}/spine` — returns ordered `SpineItem[]`
-- [ ] `GET /api/epub/{id}/content/{**resourcePath}` — streams resource bytes with correct Content-Type
-- [ ] Implement `EpubReader` React component as a full-screen overlay
-- [ ] Initialize epub.js `Book` with base URL `/api/epub/{bookId}/content/`
-- [ ] Create epub.js `Rendition` into a `<div ref>`, size 100% width/height
-- [ ] Wire `rendition.prev()` / `rendition.next()` to Previous/Next buttons
-- [ ] Populate TOC sidebar from `book.navigation.toc`; clicking a TOC item calls `rendition.display(href)`
-- [ ] Font size controls: increase/decrease call `rendition.themes.fontSize()`
-- [ ] Reader chrome: TOC toggle button, book title + current chapter name, font size controls, Close button
-- [ ] Progress bar: derived from `rendition.currentLocation().start.percentage * 100`
-- [ ] Close button hides overlay (sets `readerVisible = false` in Zustand), does NOT save progress yet (that's Phase 11)
-- [ ] Reader overlay animation: slide up from bottom or fade in with framer-motion
+- [x] Add `EpubController` to `Libris.Api` — spine endpoint and resource streaming endpoint
+- [x] `GET /api/epub/{id}/spine` — returns ordered `SpineItem[]`
+- [x] `GET /api/epub/{id}/content/{**resourcePath}` — streams resource bytes with correct Content-Type
+- [x] Implement `EpubReader` React component as a full-screen overlay
+- [x] Initialize epub.js `Book` with base URL `/api/epub/{bookId}/content/`
+- [x] Create epub.js `Rendition` into a `<div ref>`, size 100% width/height
+- [x] Wire `rendition.prev()` / `rendition.next()` to Previous/Next buttons
+- [x] Populate TOC sidebar from `book.navigation.toc`; clicking a TOC item calls `rendition.display(href)`
+- [x] Font size controls: increase/decrease call `rendition.themes.fontSize()`
+- [x] Reader chrome: TOC toggle button, book title + current chapter name, font size controls, Close button
+- [x] Progress bar: derived from `rendition.currentLocation().start.percentage * 100`
+- [x] Close button hides overlay (sets `readerVisible = false` in Zustand), does NOT save progress yet (that's Phase 11)
+- [x] Reader overlay animation: slide up from bottom or fade in with framer-motion
 - [ ] Verify double-clicking a book opens the reader and renders content correctly
 
 ---
