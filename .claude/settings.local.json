@@ -16,7 +16,10 @@
       "Bash(dotnet test *)",
       "Bash(dotnet run *)",
       "Bash(dotnet /tmp/EpubProbe/bin/Debug/net10.0/EpubProbe.dll)",
-      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\ScottMorgan\\\\.nuget\\\\packages\\\\versone.epub\\\\3.3.6\\\\\" -Recurse -File | Select-Object -ExpandProperty FullName | head -30)"
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\ScottMorgan\\\\.nuget\\\\packages\\\\versone.epub\\\\3.3.6\\\\\" -Recurse -File | Select-Object -ExpandProperty FullName | head -30)",
+      "Bash(npm run *)",
+      "Bash(npx vite *)",
+      "Bash(npm install *)"
     ]
   }
 }
