@@ -22,4 +22,10 @@
     <ProjectReference Include="..\..\src\Libris.Epub\Libris.Epub.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Fixtures\AgarthaLoop2.epub">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

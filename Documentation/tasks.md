@@ -64,7 +64,7 @@
 - [x] Target `net10.0-windows` in `Libris.Storage` — unlocks `System.Drawing` (GDI+), no external image package needed
 - [x] Create initial EF Core migration (`InitialCreate`)
 - [ ] Apply migration programmatically on startup (`context.Database.MigrateAsync()`)
-- [ ] Write `LibrisDataPaths` unit test
+- [x] Write `LibrisDataPaths` unit test
 
 ---
 
@@ -83,16 +83,16 @@
 
 ## Phase 5 — Storage Tests
 
-- [ ] Add 2–3 EPUB fixture files to `tests/Libris.Epub.Tests/Fixtures/`
-- [ ] `EpubParserTests` — metadata extraction: verify title, authors, ISBN match known fixture values
-- [ ] `EpubParserTests` — cover extraction: verify non-null bytes returned for a book with a cover
-- [ ] `EpubParserTests` — resource serving: verify correct bytes and MIME type for a known spine item
-- [ ] `EpubParserTests` — spine: verify spine order matches expected item count
-- [ ] `LibraryRepositoryTests` — add book, get by ID, update metadata, remove, verify not found
-- [ ] `LibraryRepositoryTests` — `GetAllBooksAsync` returns all inserted books
-- [ ] `ReadingProgressRepositoryTests` — save progress, retrieve, verify CFI and percentage round-trip
-- [ ] `ReadingProgressRepositoryTests` — upsert: second save overwrites first
-- [ ] `CoverCacheManagerTests` — save raw bytes, verify JPEG file exists at expected path, verify dimensions
+- [x] Add 2–3 EPUB fixture files to `tests/Libris.Epub.Tests/Fixtures/`
+- [x] `EpubParserTests` — metadata extraction: verify title, authors, ISBN match known fixture values
+- [x] `EpubParserTests` — cover extraction: verify non-null bytes returned for a book with a cover
+- [x] `EpubParserTests` — resource serving: verify correct bytes and MIME type for a known spine item
+- [x] `EpubParserTests` — spine: verify spine order matches expected item count
+- [x] `LibraryRepositoryTests` — add book, get by ID, update metadata, remove, verify not found
+- [x] `LibraryRepositoryTests` — `GetAllBooksAsync` returns all inserted books
+- [x] `ReadingProgressRepositoryTests` — save progress, retrieve, verify CFI and percentage round-trip
+- [x] `ReadingProgressRepositoryTests` — upsert: second save overwrites first
+- [x] `CoverCacheManagerTests` — save raw bytes, verify JPEG file exists at expected path, verify dimensions
 
 ---
 
