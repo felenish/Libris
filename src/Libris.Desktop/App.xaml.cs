@@ -1,6 +1,8 @@
 using System.Net;
 using System.Net.Sockets;
+using System.Text.Json;
 using System.Windows;
+using Libris.Api.Services;
 using Libris.Core.Interfaces;
 using Libris.Epub;
 using Libris.Storage;
@@ -69,7 +71,16 @@ public partial class App : Application
         builder.Services.AddSingleton<IEpubParser, EpubParser>();
         builder.Services.AddSingleton<IShellService>(new WpfShellService());
 
-        builder.Services.AddControllers();
+        builder.Services.AddScoped<LibraryService>();
+        builder.Services.AddScoped<ShelfService>();
+
+        builder.Services.AddControllers()
+            .AddApplicationPart(typeof(Libris.Api.Controllers.LibraryController).Assembly)
+            .AddJsonOptions(o =>
+            {
+                o.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            });
 
         var app = builder.Build();
 

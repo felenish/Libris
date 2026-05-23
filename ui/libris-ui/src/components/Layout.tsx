@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { TopBar } from './TopBar';
 
 interface LayoutProps {
   children?: ReactNode;
@@ -7,9 +8,7 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   return (
     <div className="layout">
-      <header className="top-bar">
-        {/* TopBar — Phase 9 */}
-      </header>
+      <TopBar />
       <main className="shelf-area">
         {children}
       </main>

@@ -138,38 +138,38 @@
 
 ## Phase 8 — Library API
 
-- [ ] Create `BookSummaryDto` — id, title, authors, cover URL, series name, series index, reading status, percentage, last read
-- [ ] Create `BookDetailDto` — all `BookSummaryDto` fields plus description, genres, publisher, published date, ISBN, language, imported date, file found
-- [ ] Create `ImportResultDto` — imported count, skipped count, errors list
-- [ ] Create `ShelfDto` and `ShelfListDto`
-- [ ] Implement `ShelfService.GetAllShelvesAsync()` — query all books, group into named shelves with correct sort order
-- [ ] Implement `ShelfService.GetContinueReadingAsync()` — books with `Status = Reading`, sorted by `LastReadUtc` desc
-- [ ] Implement `LibraryService.ImportAsync(string filePath)` — validate, parse, extract cover, save to DB
-- [ ] Implement `LibraryService.ImportFolderAsync(string folderPath)` — recursive `.epub` scan, skip duplicates by path
-- [ ] Implement `LibraryService.RemoveAsync(Guid id)` — delete record, delete cached cover file
-- [ ] Implement `LibraryController` with all four routes
-- [ ] Implement `BooksController` with metadata get/update and cover get/put
-- [ ] Implement `ShelvesController` — `GET /api/shelves`, `GET /api/shelves/continue-reading`
-- [ ] Implement `ShellController` with file dialog and folder dialog endpoints
-- [ ] Verify import of a real EPUB returns 200 and the book appears in `GET /api/library/books`
+- [x] Create `BookSummaryDto` — id, title, authors, cover URL, series name, series index, reading status, percentage, last read
+- [x] Create `BookDetailDto` — all `BookSummaryDto` fields plus description, genres, publisher, published date, ISBN, language, imported date, file found
+- [x] Create `ImportResultDto` — imported count, skipped count, errors list
+- [x] Create `ShelfDto` and `ShelfListDto`
+- [x] Implement `ShelfService.GetAllShelvesAsync()` — query all books, group into named shelves with correct sort order
+- [x] Implement `ShelfService.GetContinueReadingAsync()` — books with `Status = Reading`, sorted by `LastReadUtc` desc
+- [x] Implement `LibraryService.ImportAsync(string filePath)` — validate, parse, extract cover, save to DB
+- [x] Implement `LibraryService.ImportFolderAsync(string folderPath)` — recursive `.epub` scan, skip duplicates by path
+- [x] Implement `LibraryService.RemoveAsync(Guid id)` — delete record, delete cached cover file
+- [x] Implement `LibraryController` with all four routes
+- [x] Implement `BooksController` with metadata get/update and cover get/put
+- [x] Implement `ShelvesController` — `GET /api/shelves`, `GET /api/shelves/continue-reading`
+- [x] Implement `ShellController` with file dialog and folder dialog endpoints
+- [x] Verify import of a real EPUB returns 200 and the book appears in `GET /api/library/books`
 
 ---
 
 ## Phase 9 — Library UI
 
-- [ ] Implement `TopBar` component — search input (non-functional for MVP), Import button, placeholder filter/sort dropdowns
-- [ ] Import button calls `openFileDialog()` then `importBook()` per returned path; invalidates shelves query on success
-- [ ] Implement `BookCard` component — `<img src={coverUrl}>`, title, author, progress bar if reading, Finished badge if finished
-- [ ] `BookCard` framer-motion hover: `scale: 1.05` with `whileHover`
-- [ ] `BookCard` hover overlay: Edit Metadata button, Open Reader button
-- [ ] `BookCard` double-click: set `openBookId` and `readerVisible = true` in Zustand store
-- [ ] `BookCard` single-click: set `openBookId` and open `BookDetailPanel`
-- [ ] Implement `ShelfRow` component — label, horizontal scroll container, `BookCard` list, scroll arrows
-- [ ] Implement `ShelfList` component — vertical stack of `ShelfRow` components; `GET /api/shelves` via TanStack Query
-- [ ] Implement `BookDetailPanel` — slide-in from right, full cover, title, authors, series position, description, genres, progress; action buttons: Read, Edit Metadata, Fetch Metadata, Remove
-- [ ] Read button sets `readerVisible = true` in Zustand store
-- [ ] Remove button calls `removeBook()`, closes panel, invalidates shelves query
-- [ ] Handle `fileFound = false` in `BookCard` and `BookDetailPanel` — show warning icon and "Relink" button placeholder
+- [x] Implement `TopBar` component — search input (non-functional for MVP), Import button, placeholder filter/sort dropdowns
+- [x] Import button calls `openFileDialog()` then `importBook()` per returned path; invalidates shelves query on success
+- [x] Implement `BookCard` component — `<img src={coverUrl}>`, title, author, progress bar if reading, Finished badge if finished
+- [x] `BookCard` framer-motion hover: `scale: 1.05` with `whileHover`
+- [x] `BookCard` hover overlay: Edit Metadata button, Open Reader button
+- [x] `BookCard` double-click: set `openBookId` and `readerVisible = true` in Zustand store
+- [x] `BookCard` single-click: set `openBookId` and open `BookDetailPanel`
+- [x] Implement `ShelfRow` component — label, horizontal scroll container, `BookCard` list, scroll arrows
+- [x] Implement `ShelfList` component — vertical stack of `ShelfRow` components; `GET /api/shelves` via TanStack Query
+- [x] Implement `BookDetailPanel` — slide-in from right, full cover, title, authors, series position, description, genres, progress; action buttons: Read, Edit Metadata, Fetch Metadata, Remove
+- [x] Read button sets `readerVisible = true` in Zustand store
+- [x] Remove button calls `removeBook()`, closes panel, invalidates shelves query
+- [x] Handle `fileFound = false` in `BookCard` and `BookDetailPanel` — show warning icon and "Relink" button placeholder
 - [ ] Verify browsing a library of 20+ imported EPUBs with covers is smooth
 
 ---
