@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import ePub from 'epubjs';
 import { useQuery } from '@tanstack/react-query';
 import { getBook } from '../api/books';
+import { getProgress, saveProgress } from '../api/progress';
 import { useLibrisStore } from '../store/useLibrisStore';
 
 interface TocItem {
@@ -22,6 +23,9 @@ export function EpubReader() {
   const bookRef = useRef<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const renditionRef = useRef<any>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastLocationRef = useRef<{ cfi: string; percentage: number } | null>(null);
+  const openBookIdRef = useRef<string | null>(null);
 
   const [toc, setToc] = useState<TocItem[]>([]);
   const tocRef = useRef<TocItem[]>([]);
@@ -37,9 +41,23 @@ export function EpubReader() {
   });
 
   useEffect(() => {
+    openBookIdRef.current = openBookId;
+  }, [openBookId]);
+
+  const flushProgress = () => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    const id = openBookIdRef.current;
+    const loc = lastLocationRef.current;
+    if (id && loc) {
+      saveProgress(id, loc.cfi, loc.percentage).catch(() => {});
+    }
+  };
+
+  useEffect(() => {
     if (!readerVisible || !openBookId || !containerRef.current) return;
 
     bookRef.current?.destroy();
+    lastLocationRef.current = null;
 
     const book = ePub(`/api/epub/${openBookId}/content/`);
     bookRef.current = book;
@@ -52,8 +70,6 @@ export function EpubReader() {
     });
     renditionRef.current = rendition;
 
-    rendition.display().catch(console.error);
-
     book.loaded.navigation.then((nav: { toc: TocItem[] }) => {
       setToc(nav.toc);
       tocRef.current = nav.toc;
@@ -63,16 +79,40 @@ export function EpubReader() {
       book.locations.generate(1024);
     });
 
-    rendition.on('relocated', (location: { start: { percentage: number; href: string } }) => {
-      setProgress(Math.round((location.start?.percentage ?? 0) * 100));
+    // Resume from saved CFI or start from beginning
+    getProgress(openBookId)
+      .then(p => {
+        if (p?.currentCfi) {
+          rendition.display(p.currentCfi).catch(console.error);
+        } else {
+          rendition.display().catch(console.error);
+        }
+      })
+      .catch(() => {
+        rendition.display().catch(console.error);
+      });
+
+    rendition.on('relocated', (location: { start: { cfi: string; percentage: number; href: string } }) => {
+      const pct = Math.round((location.start?.percentage ?? 0) * 100);
+      const cfi = location.start?.cfi ?? '';
       const href = location.start?.href ?? '';
+
+      setProgress(pct);
       setCurrentChapter(findChapterLabel(tocRef.current, href));
+      lastLocationRef.current = { cfi, percentage: location.start?.percentage ?? 0 };
+
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        saveProgress(openBookId, cfi, location.start?.percentage ?? 0).catch(() => {});
+      }, 2000);
     });
 
     return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
       book.destroy();
       bookRef.current = null;
       renditionRef.current = null;
+      lastLocationRef.current = null;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readerVisible, openBookId]);
@@ -81,7 +121,27 @@ export function EpubReader() {
     renditionRef.current?.themes.fontSize(`${fontSize}%`);
   }, [fontSize]);
 
+  // Save on page unload (WPF window close)
+  useEffect(() => {
+    const handler = () => {
+      const id = openBookIdRef.current;
+      const loc = lastLocationRef.current;
+      if (id && loc) {
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        fetch(`/api/books/${id}/progress`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cfi: loc.cfi, percentage: loc.percentage }),
+          keepalive: true,
+        }).catch(() => {});
+      }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, []);
+
   const handleClose = () => {
+    flushProgress();
     setReaderVisible(false);
     setTocOpen(false);
   };

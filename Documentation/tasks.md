@@ -189,44 +189,44 @@
 - [x] Progress bar: derived from `rendition.currentLocation().start.percentage * 100`
 - [x] Close button hides overlay (sets `readerVisible = false` in Zustand), does NOT save progress yet (that's Phase 11)
 - [x] Reader overlay animation: slide up from bottom or fade in with framer-motion
-- [ ] Verify double-clicking a book opens the reader and renders content correctly
+- [x] Verify double-clicking a book opens the reader and renders content correctly
 
 ---
 
 ## Phase 11 — Progress Persistence
 
-- [ ] Implement `ReadingProgressService.GetProgressAsync(Guid id)`
-- [ ] Implement `ReadingProgressService.SaveProgressAsync(Guid id, string cfi, double percentage)` — upsert, set `Status = Reading`, update `LastReadUtc`
-- [ ] Add `ProgressController` — `GET /api/books/{id}/progress`, `PUT /api/books/{id}/progress`
-- [ ] `SaveProgressRequest` DTO — `Cfi` (string), `Percentage` (double)
-- [ ] React reader: on `locationChanged` event, debounce-PUT progress (2-second debounce)
-- [ ] React reader: on close button click, immediate PUT before hiding overlay
-- [ ] React reader: `beforeunload` event — synchronous fetch save
-- [ ] React reader: on open, fetch progress; if `currentCfi` exists call `rendition.display(cfi)` before first render
+- [x] Implement `ReadingProgressService.GetProgressAsync(Guid id)`
+- [x] Implement `ReadingProgressService.SaveProgressAsync(Guid id, string cfi, double percentage)` — upsert, set `Status = Reading`, update `LastReadUtc`
+- [x] Add `ProgressController` — `GET /api/books/{id}/progress`, `PUT /api/books/{id}/progress`
+- [x] `SaveProgressRequest` DTO — `Cfi` (string), `Percentage` (double)
+- [x] React reader: on `locationChanged` event, debounce-PUT progress (2-second debounce)
+- [x] React reader: on close button click, immediate PUT before hiding overlay
+- [x] React reader: `beforeunload` event — synchronous fetch save
+- [x] React reader: on open, fetch progress; if `currentCfi` exists call `rendition.display(cfi)` before first render
 - [ ] Verify: open book, read 3 pages, close, reopen — reader resumes at correct position
-- [ ] `ShelfService.GetAllShelvesAsync()` — include Continue Reading shelf with `Status = Reading` books
+- [x] `ShelfService.GetAllShelvesAsync()` — include Continue Reading shelf with `Status = Reading` books
 - [ ] Verify Continue Reading shelf appears and shows in-progress books sorted by most recently read
 
 ---
 
 ## Phase 12 — Metadata Editor
 
-- [ ] Implement `OpenLibraryMetadataProvider : IMetadataProvider`
-  - [ ] `FetchByIsbnAsync` — `GET https://openlibrary.org/api/books?bibkeys=ISBN:{isbn}&format=json&jscmd=data`
-  - [ ] `SearchAsync` — `GET https://openlibrary.org/search.json?title={t}&author={a}&limit=10`
-  - [ ] Parse title, authors, publishers, publish_date, subjects
-- [ ] Implement `GoogleBooksMetadataProvider : IMetadataProvider`
-  - [ ] `FetchByIsbnAsync` — `GET https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}`
-  - [ ] `SearchAsync` — `GET https://www.googleapis.com/books/v1/volumes?q={t}+inauthor:{a}&maxResults=10`
-  - [ ] Parse title, authors, publisher, publishedDate, description, categories, imageLinks
-- [ ] Implement `MetadataService.SearchAsync(string title, string? author)` — query both providers in parallel, merge and rank results
-- [ ] Implement `MetadataService.FetchAndApplyAsync(Guid id, ExternalBookMetadata selected)` — merge non-empty fields, download and cache cover if URL present
-- [ ] Add `MetadataController` — `POST /api/books/{id}/metadata/fetch`, `POST /api/metadata/search`
-- [ ] Register `HttpClient` for both providers in `App.xaml.cs` `BuildApi()`
-- [ ] Implement `MetadataEditor` modal in React — editable fields: Title, Authors (tag input), Series Name, Series Number, Genres (tag input), Publisher, Published Date, Description, ISBN, Language
-- [ ] Implement `MetadataSearchPanel` sub-panel — "Search for Metadata" button, results list, select to populate fields
-- [ ] User can accept/discard individual fields (checkbox per field) before saving
-- [ ] Save calls `PUT /api/books/{id}/metadata`, invalidates book and shelves queries
+- [x] Implement `OpenLibraryMetadataProvider : IMetadataProvider`
+  - [x] `FetchByIsbnAsync` — `GET https://openlibrary.org/api/books?bibkeys=ISBN:{isbn}&format=json&jscmd=data`
+  - [x] `SearchAsync` — `GET https://openlibrary.org/search.json?title={t}&author={a}&limit=10`
+  - [x] Parse title, authors, publishers, publish_date, subjects
+- [x] Implement `GoogleBooksMetadataProvider : IMetadataProvider`
+  - [x] `FetchByIsbnAsync` — `GET https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}`
+  - [x] `SearchAsync` — `GET https://www.googleapis.com/books/v1/volumes?q={t}+inauthor:{a}&maxResults=10`
+  - [x] Parse title, authors, publisher, publishedDate, description, categories, imageLinks
+- [x] Implement `MetadataService.SearchAsync(string title, string? author)` — query both providers in parallel, merge and rank results
+- [x] Implement `MetadataService.FetchAndApplyAsync(Guid id, ExternalBookMetadata selected)` — merge non-empty fields, download and cache cover if URL present
+- [x] Add `MetadataController` — `POST /api/books/{id}/metadata/fetch`, `POST /api/metadata/search`
+- [x] Register `HttpClient` for both providers in `App.xaml.cs` `BuildApi()`
+- [x] Implement `MetadataEditor` modal in React — editable fields: Title, Authors (tag input), Series Name, Series Number, Genres (tag input), Publisher, Published Date, Description, ISBN, Language
+- [x] Implement `MetadataSearchPanel` sub-panel — "Search for Metadata" button, results list, select to populate fields
+- [x] User can accept/discard individual fields (checkbox per field) before saving
+- [x] Save calls `PUT /api/books/{id}/metadata`, invalidates book and shelves queries
 - [ ] Verify: fetch metadata for a book with a known ISBN, confirm fields populate correctly
 
 ---

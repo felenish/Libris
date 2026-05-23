@@ -5,6 +5,7 @@ using System.Windows;
 using Libris.Api.Services;
 using Libris.Core.Interfaces;
 using Libris.Epub;
+using Libris.Metadata;
 using Libris.Storage;
 using Libris.Storage.Data;
 using Libris.Storage.Repositories;
@@ -61,6 +62,7 @@ public partial class App : Application
 
         builder.WebHost.UseUrls($"http://localhost:{port}");
         builder.Logging.SetMinimumLevel(LogLevel.Warning);
+        builder.Logging.AddFilter("System.Net.Http", LogLevel.Warning);
 
         builder.Services.AddDbContext<LibrisDbContext>(o =>
             o.UseSqlite($"Data Source={LibrisDataPaths.DatabasePath}"));
@@ -71,8 +73,13 @@ public partial class App : Application
         builder.Services.AddSingleton<IEpubParser, EpubParser>();
         builder.Services.AddSingleton<IShellService>(new WpfShellService());
 
+        builder.Services.AddHttpClient<OpenLibraryMetadataProvider>();
+        builder.Services.AddHttpClient<GoogleBooksMetadataProvider>();
+
         builder.Services.AddScoped<LibraryService>();
         builder.Services.AddScoped<ShelfService>();
+        builder.Services.AddScoped<ReadingProgressService>();
+        builder.Services.AddScoped<MetadataService>();
 
         builder.Services.AddControllers()
             .AddApplicationPart(typeof(Libris.Api.Controllers.LibraryController).Assembly)

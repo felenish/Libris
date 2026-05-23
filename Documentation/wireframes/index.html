@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Libris — Wireframes</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Kalam:wght@300;400;700&family=Architects+Daughter&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  html, body { margin: 0; padding: 0; background: #f0eee9; font-family: 'Architects Daughter', 'Kalam', system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+
+  /* Sketchy primitive styles — shared across all wireframes */
+  .sk        { font-family: 'Architects Daughter', 'Kalam', sans-serif; }
+  .sk-hand   { font-family: 'Caveat', cursive; }
+  .sk-mono   { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+  /* Box with hand-drawn-ish dashed/wobble border */
+  .sk-box {
+    border: 1.5px solid currentColor;
+    border-radius: 6px;
+    position: relative;
+  }
+  .sk-box-dashed { border-style: dashed; }
+  .sk-box-thick  { border-width: 2.5px; }
+
+  /* Hand-drawn cover placeholder */
+  .sk-cover {
+    background:
+      repeating-linear-gradient(135deg,
+        transparent 0 9px,
+        rgba(0,0,0,0.06) 9px 10px);
+    border: 1.5px solid currentColor;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .sk-cover-dark {
+    background:
+      repeating-linear-gradient(135deg,
+        transparent 0 9px,
+        rgba(255,255,255,0.08) 9px 10px);
+  }
+  .sk-cover-x::after {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(to top right, transparent calc(50% - 0.6px), currentColor calc(50% - 0.4px), currentColor calc(50% + 0.4px), transparent calc(50% + 0.6px)),
+      linear-gradient(to top left,  transparent calc(50% - 0.6px), currentColor calc(50% - 0.4px), currentColor calc(50% + 0.4px), transparent calc(50% + 0.6px));
+    opacity: 0.18;
+    pointer-events: none;
+  }
+
+  /* Progress bar fill */
+  .sk-progress {
+    height: 4px;
+    background: rgba(0,0,0,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+  .sk-progress > i {
+    display: block; height: 100%;
+    background: #c96442;
+    border-radius: 2px;
+  }
+
+  /* Generic "button" */
+  .sk-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    border: 1.5px solid currentColor;
+    border-radius: 999px;
+    font-family: 'Kalam', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    background: transparent;
+    cursor: default;
+    white-space: nowrap;
+  }
+  .sk-btn-solid {
+    background: currentColor;
+  }
+  .sk-btn-solid > * { color: var(--sk-bg, #fff); }
+
+  .sk-pill {
+    display: inline-block;
+    padding: 2px 9px;
+    border: 1.2px solid currentColor;
+    border-radius: 999px;
+    font-family: 'Kalam', sans-serif;
+    font-size: 11.5px;
+    line-height: 1.4;
+  }
+
+  /* Tiny note style */
+  .sk-note {
+    font-family: 'Caveat', cursive;
+    font-size: 16px;
+    color: #c96442;
+    line-height: 1.1;
+  }
+
+  /* arrows / scribbles */
+  .sk-divider {
+    border: none;
+    border-top: 1.5px dashed currentColor;
+    opacity: 0.4;
+  }
+
+  /* shelf row scroll-hint chevrons */
+  .sk-chev {
+    display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center;
+    border: 1.4px solid currentColor; border-radius: 999px;
+    font-family: 'Kalam'; font-size: 13px;
+  }
+
+  /* dark mode within an artboard */
+  .sk-dark { background: #0c0c10; color: #e8e6df; }
+  .sk-light { background: #faf8f3; color: #1a1a1f; }
+
+  /* The annotation callout used outside artboards */
+  .anno {
+    font-family: 'Caveat', cursive;
+    color: #c96442;
+    font-size: 18px;
+    line-height: 1.15;
+  }
+
+  /* loading splash before babel finishes */
+  .boot { padding: 40px; font-family: 'Caveat'; color:#5a4a2a; font-size: 22px; }
+</style>
+</head>
+<body>
+<div id="root"><div class="boot">Sketching wireframes…</div></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="primitives.jsx"></script>
+<script type="text/babel" src="library.jsx"></script>
+<script type="text/babel" src="detail.jsx"></script>
+<script type="text/babel" src="metadata.jsx"></script>
+<script type="text/babel" src="reader.jsx"></script>
+<script type="text/babel" src="app.jsx"></script>
+</body>
+</html>

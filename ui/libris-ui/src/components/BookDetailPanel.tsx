@@ -7,9 +7,10 @@ import { useLibrisStore } from '../store/useLibrisStore';
 interface BookDetailPanelProps {
   bookId: string | null;
   onClose: () => void;
+  onEditMetadata: (id: string) => void;
 }
 
-export function BookDetailPanel({ bookId, onClose }: BookDetailPanelProps) {
+export function BookDetailPanel({ bookId, onClose, onEditMetadata }: BookDetailPanelProps) {
   const queryClient = useQueryClient();
   const setReaderVisible = useLibrisStore(s => s.setReaderVisible);
   const setOpenBookId = useLibrisStore(s => s.setOpenBookId);
@@ -77,8 +78,8 @@ export function BookDetailPanel({ bookId, onClose }: BookDetailPanelProps) {
 
               <div className="panel-actions">
                 <button className="btn-primary" onClick={handleRead}>Read</button>
-                <button className="btn-secondary" disabled>Edit Metadata</button>
-                <button className="btn-secondary" disabled>Fetch Metadata</button>
+                <button className="btn-secondary" onClick={() => bookId && onEditMetadata(bookId)}>Edit Metadata</button>
+                <button className="btn-secondary" onClick={() => bookId && onEditMetadata(bookId)}>Fetch Metadata</button>
                 <button className="btn-danger" onClick={handleRemove}>Remove</button>
               </div>
             </>

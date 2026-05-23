@@ -41,10 +41,32 @@ public sealed record ShelfDto(
     string Label,
     IReadOnlyList<BookSummaryDto> Books);
 
+public sealed record ReadingProgressDto(
+    Guid BookId,
+    string? CurrentCfi,
+    double Percentage,
+    string Status,
+    DateTimeOffset? LastReadUtc,
+    int TotalReadingMinutes);
+
+public sealed record ExternalBookMetadataDto(
+    string? Title,
+    IReadOnlyList<string> Authors,
+    string? Publisher,
+    string? PublishedDate,
+    string? Description,
+    string? Isbn,
+    string? Language,
+    IReadOnlyList<string> Genres,
+    string? CoverUrl);
+
 // Request bodies
 public sealed record ImportBookRequest(string FilePath);
 public sealed record ImportFolderRequest(string FolderPath);
 public sealed record RevealRequest(string Path);
+
+public sealed record SaveProgressRequest(string Cfi, double Percentage);
+public sealed record MetadataSearchRequest(string Title, string? Author);
 
 public sealed record UpdateMetadataRequest(
     string? Title,
