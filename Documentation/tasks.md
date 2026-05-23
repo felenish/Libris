@@ -112,27 +112,27 @@
 - [x] `RevealInExplorerAsync` — `Process.Start("explorer.exe", $"/select,\"{path}\"")`
 - [x] Load and save window state (bounds, `WindowState`) to `settings.json` via `System.Text.Json`
 - [x] `OnExit` — stop Kestrel gracefully with `_api.StopAsync()`
-- [ ] Verify WebView2 loads Vite dev server page in debug mode without errors
+- [x] Verify WebView2 loads Vite dev server page in debug mode without errors
 
 ---
 
 ## Phase 7 — React Scaffold
 
-- [ ] Install `@tanstack/react-query` and configure `QueryClient` with default stale time
-- [ ] Install `zustand` and create `useLibrisStore` with `openBookId`, `readerVisible`, `activeShelfId`
-- [ ] Install `framer-motion`
-- [ ] Install `epubjs` and `@types/epubjs`
-- [ ] Configure Vite proxy: `/api` → `http://localhost:7070` (or env-var-driven port)
-- [ ] Create `src/api/library.ts` — typed wrappers: `getBooks()`, `importBook()`, `importFolder()`, `removeBook()`
-- [ ] Create `src/api/books.ts` — `getBook()`, `updateMetadata()`, `getCoverUrl()` (returns URL string, not fetched data)
-- [ ] Create `src/api/shelves.ts` — `getShelves()`, `getContinueReading()`
-- [ ] Create `src/api/progress.ts` — `getProgress()`, `saveProgress()`
-- [ ] Create `src/api/epub.ts` — `getSpine()`, `getResourceUrl()` (returns URL string)
-- [ ] Create `src/api/shell.ts` — `openFileDialog()`, `openFolderDialog()`
-- [ ] Create `src/api/metadata.ts` — `fetchMetadata()`, `searchMetadata()`
-- [ ] Add global error handler in `QueryClient` config — extract `error.code` and display toast
-- [ ] Create `src/components/Layout.tsx` — top bar + main scroll area shell
-- [ ] Verify `npm run dev` loads and `/api/library/books` returns `[]`
+- [x] Install `@tanstack/react-query` and configure `QueryClient` with default stale time
+- [x] Install `zustand` and create `useLibrisStore` with `openBookId`, `readerVisible`, `activeShelfId`
+- [x] Install `framer-motion`
+- [x] Install `epubjs` and `@types/epubjs`
+- [x] Configure Vite proxy: `/api` → `http://localhost:7070` (or env-var-driven port)
+- [x] Create `src/api/library.ts` — typed wrappers: `getBooks()`, `importBook()`, `importFolder()`, `removeBook()`
+- [x] Create `src/api/books.ts` — `getBook()`, `updateMetadata()`, `getCoverUrl()` (returns URL string, not fetched data)
+- [x] Create `src/api/shelves.ts` — `getShelves()`, `getContinueReading()`
+- [x] Create `src/api/progress.ts` — `getProgress()`, `saveProgress()`
+- [x] Create `src/api/epub.ts` — `getSpine()`, `getResourceUrl()` (returns URL string)
+- [x] Create `src/api/shell.ts` — `openFileDialog()`, `openFolderDialog()`
+- [x] Create `src/api/metadata.ts` — `fetchMetadata()`, `searchMetadata()`
+- [x] Add global error handler in `QueryClient` config — extract `error.code` and display toast
+- [x] Create `src/components/Layout.tsx` — top bar + main scroll area shell
+- [x] Verify `npm run dev` loads and `/api/library/books` returns `[]`
 
 ---
 
