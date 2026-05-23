@@ -8,18 +8,28 @@ import { MetadataEditor } from './components/MetadataEditor';
 import { useLibrisStore } from './store/useLibrisStore';
 
 function App() {
-  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+  const [detailBookId, setDetailBookId] = useState<string | null>(null);
   const [editorBookId, setEditorBookId] = useState<string | null>(null);
+  const [editorFocusSearch, setEditorFocusSearch] = useState(false);
   const setOpenBookId = useLibrisStore(s => s.setOpenBookId);
 
   const handleBookSelect = (id: string) => {
-    setSelectedBookId(id);
+    setDetailBookId(id);
     setOpenBookId(id);
   };
 
   const handleDetailClose = () => {
-    setSelectedBookId(null);
-    setOpenBookId(null);
+    setDetailBookId(null);
+  };
+
+  const handleEditMetadata = (id: string, focusSearch = false) => {
+    setEditorBookId(id);
+    setEditorFocusSearch(focusSearch);
+  };
+
+  const handleEditorClose = () => {
+    setEditorBookId(null);
+    setEditorFocusSearch(false);
   };
 
   return (
@@ -27,17 +37,27 @@ function App() {
       <Layout>
         <ShelfList onBookSelect={handleBookSelect} />
       </Layout>
-      <BookDetailPanel
-        bookId={selectedBookId}
-        onClose={handleDetailClose}
-        onEditMetadata={id => setEditorBookId(id)}
-      />
+
+      <AnimatePresence>
+        {detailBookId && (
+          <BookDetailPanel
+            key={detailBookId}
+            bookId={detailBookId}
+            onClose={handleDetailClose}
+            onEditMetadata={handleEditMetadata}
+          />
+        )}
+      </AnimatePresence>
+
       <EpubReader />
+
       <AnimatePresence>
         {editorBookId && (
           <MetadataEditor
+            key={editorBookId}
             bookId={editorBookId}
-            onClose={() => setEditorBookId(null)}
+            focusSearch={editorFocusSearch}
+            onClose={handleEditorClose}
           />
         )}
       </AnimatePresence>

@@ -21,4 +21,8 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <Target Name="BuildReactApp" BeforeTargets="Build" Condition="'$(CI)' != '1'">
+    <Exec Command="npm run build" WorkingDirectory="$(MSBuildThisFileDirectory)..\..\ui\libris-ui" />
+  </Target>
+
 </Project>

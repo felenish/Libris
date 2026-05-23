@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { Search, Plus } from 'lucide-react';
 import { openFileDialog } from '../api/shell';
 import { importBook } from '../api/library';
 
@@ -26,8 +27,17 @@ export function TopBar() {
   return (
     <header className="top-bar">
       <span className="app-title">Libris</span>
-      <input className="search-input" placeholder="Search..." disabled />
+
+      <div className="search-wrap">
+        <span className="search-icon"><Search size={14} /></span>
+        <input className="search-input" placeholder="Search library…" disabled />
+      </div>
+
+      <button className="btn-chip" disabled>Filter ▾</button>
+      <button className="btn-chip" disabled>Sort ▾</button>
+
       <button className="btn-import" onClick={handleImport} disabled={importing}>
+        <Plus size={14} />
         {importing ? 'Importing…' : 'Import'}
       </button>
     </header>

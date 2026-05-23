@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Search } from 'lucide-react';
 import { getBook, updateMetadata } from '../api/books';
 import { searchMetadata, fetchAndApplyMetadata } from '../api/metadata';
 import type { ExternalBookMetadataDto } from '../api/types';
@@ -18,24 +19,19 @@ interface FormState {
   language: string;
 }
 
-interface FieldChecks {
-  title: boolean;
-  authors: boolean;
-  publisher: boolean;
-  publishedDate: boolean;
-  description: boolean;
-  isbn: boolean;
-  language: boolean;
-  genres: boolean;
-  cover: boolean;
-}
-
 interface MetadataEditorProps {
   bookId: string;
+  focusSearch?: boolean;
   onClose: () => void;
 }
 
-export function MetadataEditor({ bookId, onClose }: MetadataEditorProps) {
+function matchQuality(r: ExternalBookMetadataDto): string {
+  if (r.isbn) return 'ISBN';
+  if (r.authors.length > 0) return 'Title+Author';
+  return 'Title';
+}
+
+export function MetadataEditor({ bookId, focusSearch, onClose }: MetadataEditorProps) {
   const queryClient = useQueryClient();
   const { data: book } = useQuery({
     queryKey: ['book', bookId],
@@ -43,20 +39,22 @@ export function MetadataEditor({ bookId, onClose }: MetadataEditorProps) {
   });
 
   const [form, setForm] = useState<FormState | null>(null);
+  const [initialForm, setInitialForm] = useState<FormState | null>(null);
+  const formInitialized = useRef(false);
+
+  const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<ExternalBookMetadataDto[]>([]);
   const [selectedResult, setSelectedResult] = useState<ExternalBookMetadataDto | null>(null);
-  const [fieldChecks, setFieldChecks] = useState<FieldChecks | null>(null);
   const [pendingCoverUrl, setPendingCoverUrl] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const formInitialized = useRef(false);
 
   useEffect(() => {
     if (book && !formInitialized.current) {
       formInitialized.current = true;
-      setForm({
+      const f: FormState = {
         title: book.title,
         authors: [...book.authors],
         seriesName: book.seriesName ?? '',
@@ -67,19 +65,28 @@ export function MetadataEditor({ bookId, onClose }: MetadataEditorProps) {
         description: book.description ?? '',
         isbn: book.isbn ?? '',
         language: book.language ?? '',
-      });
+      };
+      setForm(f);
+      setInitialForm(f);
+      setSearchQuery(`${book.title}${book.authors[0] ? ` · ${book.authors[0]}` : ''}`);
+
+      if (focusSearch) {
+        // auto-trigger search when opened via "Fetch info"
+        triggerSearch(book.title, book.authors[0] ?? '');
+      }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [book]);
 
-  const handleSearch = async () => {
-    if (!form?.title) return;
+  const triggerSearch = async (title: string, author: string) => {
+    if (!title) return;
     setIsSearching(true);
     setHasSearched(false);
     setSearchError(null);
     setSearchResults([]);
     setSelectedResult(null);
     try {
-      const results = await searchMetadata(form.title, form.authors[0]);
+      const results = await searchMetadata(title, author);
       setSearchResults(results);
       setHasSearched(true);
     } catch (e) {
@@ -89,37 +96,34 @@ export function MetadataEditor({ bookId, onClose }: MetadataEditorProps) {
     }
   };
 
-  const handleSelectResult = (result: ExternalBookMetadataDto) => {
-    setSelectedResult(result);
-    setFieldChecks({
-      title: !!result.title,
-      authors: result.authors.length > 0,
-      publisher: !!result.publisher,
-      publishedDate: !!result.publishedDate,
-      description: !!result.description,
-      isbn: !!result.isbn,
-      language: !!result.language,
-      genres: result.genres.length > 0,
-      cover: !!result.coverUrl,
-    });
+  const handleSearch = () => {
+    if (!form) return;
+    triggerSearch(form.title, form.authors[0] ?? '');
   };
 
-  const handleApplyToForm = () => {
-    if (!selectedResult || !fieldChecks || !form) return;
+  const handleSelectResult = (result: ExternalBookMetadataDto) => {
+    setSelectedResult(result);
     setForm(prev => prev ? {
       ...prev,
-      title: fieldChecks.title && selectedResult.title ? selectedResult.title : prev.title,
-      authors: fieldChecks.authors && selectedResult.authors.length > 0 ? selectedResult.authors : prev.authors,
-      publisher: fieldChecks.publisher && selectedResult.publisher ? selectedResult.publisher : prev.publisher,
-      publishedDate: fieldChecks.publishedDate && selectedResult.publishedDate ? selectedResult.publishedDate : prev.publishedDate,
-      description: fieldChecks.description && selectedResult.description ? selectedResult.description : prev.description,
-      isbn: fieldChecks.isbn && selectedResult.isbn ? selectedResult.isbn : prev.isbn,
-      language: fieldChecks.language && selectedResult.language ? selectedResult.language : prev.language,
-      genres: fieldChecks.genres && selectedResult.genres.length > 0 ? selectedResult.genres : prev.genres,
+      title: result.title ?? prev.title,
+      authors: result.authors.length > 0 ? result.authors : prev.authors,
+      publisher: result.publisher ?? prev.publisher,
+      publishedDate: result.publishedDate ?? prev.publishedDate,
+      description: result.description ?? prev.description,
+      isbn: result.isbn ?? prev.isbn,
+      language: result.language ?? prev.language,
+      genres: result.genres.length > 0 ? result.genres : prev.genres,
     } : prev);
-    setPendingCoverUrl(fieldChecks.cover && selectedResult.coverUrl ? selectedResult.coverUrl : null);
-    setSelectedResult(null);
-    setSearchResults([]);
+    setPendingCoverUrl(result.coverUrl ?? null);
+  };
+
+  const isDirty = form && initialForm && JSON.stringify(form) !== JSON.stringify(initialForm);
+
+  const handleBackdropClick = () => {
+    if (isDirty) {
+      if (!window.confirm('Discard unsaved changes?')) return;
+    }
+    onClose();
   };
 
   const handleSave = async () => {
@@ -151,7 +155,7 @@ export function MetadataEditor({ bookId, onClose }: MetadataEditorProps) {
       await queryClient.invalidateQueries({ queryKey: ['shelves'] });
       onClose();
     } catch {
-      // save failed
+      // save failed silently for MVP
     } finally {
       setIsSaving(false);
     }
@@ -163,196 +167,198 @@ export function MetadataEditor({ bookId, onClose }: MetadataEditorProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.15 }}
-      onClick={onClose}
+      transition={{ duration: 0.18 }}
+      onClick={handleBackdropClick}
     >
       <motion.div
         className="editor-modal"
         initial={{ scale: 0.96, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.96, opacity: 0 }}
-        transition={{ duration: 0.15 }}
+        transition={{ duration: 0.18 }}
         onClick={e => e.stopPropagation()}
       >
-        <div className="editor-header">
-          <span>Edit Metadata</span>
-          <button className="editor-close-btn" onClick={onClose}>✕</button>
-        </div>
+        {/* Left pane — form */}
+        <div className="editor-left">
+          <div className="editor-header">
+            <p className="editor-eyebrow">Edit metadata</p>
+            <h2 className="editor-book-title">{book?.title ?? '…'}</h2>
+          </div>
 
-        <div className="editor-body">
-          {!form ? (
-            <p className="status-msg">Loading…</p>
-          ) : (
-            <>
-              <div className="form-row">
-                <label className="form-label">Title</label>
-                <input className="form-input" value={form.title}
-                  onChange={e => setForm(f => f ? { ...f, title: e.target.value } : f)} />
-              </div>
-
-              <div className="form-row">
-                <label className="form-label">Authors</label>
-                <TagInput tags={form.authors}
-                  onChange={authors => setForm(f => f ? { ...f, authors } : f)} />
-              </div>
-
-              <div className="form-row-inline">
+          <div className="editor-body">
+            {!form ? (
+              <p className="status-msg">Loading…</p>
+            ) : (
+              <>
                 <div className="form-row">
-                  <label className="form-label">Series</label>
-                  <input className="form-input" value={form.seriesName} placeholder="Series name"
-                    onChange={e => setForm(f => f ? { ...f, seriesName: e.target.value } : f)} />
+                  <label className="form-label">Title</label>
+                  <input className="form-input" value={form.title}
+                    onChange={e => setForm(f => f ? { ...f, title: e.target.value } : f)} />
                 </div>
+
                 <div className="form-row">
-                  <label className="form-label">#</label>
-                  <input className="form-input" value={form.seriesIndex} placeholder="0"
-                    onChange={e => setForm(f => f ? { ...f, seriesIndex: e.target.value } : f)} />
+                  <label className="form-label">Authors</label>
+                  <TagInput tags={form.authors}
+                    onChange={authors => setForm(f => f ? { ...f, authors } : f)} />
                 </div>
-              </div>
 
-              <div className="form-row">
-                <label className="form-label">Genres</label>
-                <TagInput tags={form.genres}
-                  onChange={genres => setForm(f => f ? { ...f, genres } : f)} />
-              </div>
-
-              <div className="form-row-inline">
-                <div className="form-row">
-                  <label className="form-label">Publisher</label>
-                  <input className="form-input" value={form.publisher}
-                    onChange={e => setForm(f => f ? { ...f, publisher: e.target.value } : f)} />
-                </div>
-                <div className="form-row">
-                  <label className="form-label">Published</label>
-                  <input className="form-input" value={form.publishedDate}
-                    onChange={e => setForm(f => f ? { ...f, publishedDate: e.target.value } : f)} />
-                </div>
-              </div>
-
-              <div className="form-row-inline">
-                <div className="form-row">
-                  <label className="form-label">ISBN</label>
-                  <input className="form-input" value={form.isbn}
-                    onChange={e => setForm(f => f ? { ...f, isbn: e.target.value } : f)} />
-                </div>
-                <div className="form-row">
-                  <label className="form-label">Language</label>
-                  <input className="form-input" value={form.language}
-                    onChange={e => setForm(f => f ? { ...f, language: e.target.value } : f)} />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <label className="form-label">Description</label>
-                <textarea className="form-input form-textarea" value={form.description}
-                  onChange={e => setForm(f => f ? { ...f, description: e.target.value } : f)} />
-              </div>
-
-              {pendingCoverUrl && (
-                <p className="pending-cover-note">
-                  Cover image will be downloaded from search result on save.{' '}
-                  <button className="link-btn" onClick={() => setPendingCoverUrl(null)}>Remove</button>
-                </p>
-              )}
-
-              {/* Search section */}
-              <p className="editor-section-title">Search for Metadata</p>
-
-              <div className="search-controls">
-                <button className="btn-secondary" onClick={handleSearch} disabled={isSearching || !form.title}>
-                  {isSearching ? 'Searching…' : 'Search Online'}
-                </button>
-              </div>
-
-              {searchError && (
-                <p className="search-feedback search-feedback-error">{searchError}</p>
-              )}
-              {hasSearched && !searchError && searchResults.length === 0 && (
-                <p className="search-feedback">No results found. Try a shorter or different title.</p>
-              )}
-
-              {searchResults.length > 0 && !selectedResult && (
-                <div className="search-results">
-                  {searchResults.map((r, i) => (
-                    <button key={i} className="search-result-item" onClick={() => handleSelectResult(r)}>
-                      <div className="result-title">{r.title}</div>
-                      <div className="result-meta">
-                        {r.authors.slice(0, 2).join(', ')}
-                        {r.publishedDate ? ` · ${r.publishedDate}` : ''}
-                        {` · ${r.genres.slice(0, 2).join(', ')}`}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {selectedResult && fieldChecks && (
-                <div className="field-checks">
-                  <p className="field-checks-title">
-                    From <strong>{selectedResult.title}</strong> — select fields to apply:
-                  </p>
-                  {selectedResult.title && (
-                    <FieldCheck label="Title" value={selectedResult.title}
-                      checked={fieldChecks.title}
-                      onChange={v => setFieldChecks(c => c ? { ...c, title: v } : c)} />
-                  )}
-                  {selectedResult.authors.length > 0 && (
-                    <FieldCheck label="Authors" value={selectedResult.authors.join(', ')}
-                      checked={fieldChecks.authors}
-                      onChange={v => setFieldChecks(c => c ? { ...c, authors: v } : c)} />
-                  )}
-                  {selectedResult.publisher && (
-                    <FieldCheck label="Publisher" value={selectedResult.publisher}
-                      checked={fieldChecks.publisher}
-                      onChange={v => setFieldChecks(c => c ? { ...c, publisher: v } : c)} />
-                  )}
-                  {selectedResult.publishedDate && (
-                    <FieldCheck label="Published" value={selectedResult.publishedDate}
-                      checked={fieldChecks.publishedDate}
-                      onChange={v => setFieldChecks(c => c ? { ...c, publishedDate: v } : c)} />
-                  )}
-                  {selectedResult.description && (
-                    <FieldCheck label="Description" value={selectedResult.description.slice(0, 80) + (selectedResult.description.length > 80 ? '…' : '')}
-                      checked={fieldChecks.description}
-                      onChange={v => setFieldChecks(c => c ? { ...c, description: v } : c)} />
-                  )}
-                  {selectedResult.isbn && (
-                    <FieldCheck label="ISBN" value={selectedResult.isbn}
-                      checked={fieldChecks.isbn}
-                      onChange={v => setFieldChecks(c => c ? { ...c, isbn: v } : c)} />
-                  )}
-                  {selectedResult.language && (
-                    <FieldCheck label="Language" value={selectedResult.language}
-                      checked={fieldChecks.language}
-                      onChange={v => setFieldChecks(c => c ? { ...c, language: v } : c)} />
-                  )}
-                  {selectedResult.genres.length > 0 && (
-                    <FieldCheck label="Genres" value={selectedResult.genres.join(', ')}
-                      checked={fieldChecks.genres}
-                      onChange={v => setFieldChecks(c => c ? { ...c, genres: v } : c)} />
-                  )}
-                  {selectedResult.coverUrl && (
-                    <FieldCheck label="Cover image" value="Download from provider"
-                      checked={fieldChecks.cover}
-                      onChange={v => setFieldChecks(c => c ? { ...c, cover: v } : c)} />
-                  )}
-                  <div className="field-checks-actions">
-                    <button className="btn-secondary" onClick={() => setSelectedResult(null)}>Back</button>
-                    <button className="btn-primary" onClick={handleApplyToForm}>Apply to Form</button>
+                <div className="form-row-inline">
+                  <div className="form-row">
+                    <label className="form-label">Series</label>
+                    <input className="form-input" value={form.seriesName} placeholder="Series name"
+                      onChange={e => setForm(f => f ? { ...f, seriesName: e.target.value } : f)} />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">#</label>
+                    <input className="form-input" value={form.seriesIndex} placeholder="0"
+                      onChange={e => setForm(f => f ? { ...f, seriesIndex: e.target.value } : f)} />
                   </div>
                 </div>
-              )}
-            </>
-          )}
+
+                <div className="form-row">
+                  <label className="form-label">Genres</label>
+                  <TagInput tags={form.genres}
+                    onChange={genres => setForm(f => f ? { ...f, genres } : f)} />
+                </div>
+
+                <div className="form-row-half">
+                  <div className="form-row">
+                    <label className="form-label">ISBN</label>
+                    <input className="form-input" value={form.isbn}
+                      onChange={e => setForm(f => f ? { ...f, isbn: e.target.value } : f)} />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">Published</label>
+                    <input className="form-input" value={form.publishedDate}
+                      onChange={e => setForm(f => f ? { ...f, publishedDate: e.target.value } : f)} />
+                  </div>
+                </div>
+
+                <div className="form-row-half">
+                  <div className="form-row">
+                    <label className="form-label">Publisher</label>
+                    <input className="form-input" value={form.publisher}
+                      onChange={e => setForm(f => f ? { ...f, publisher: e.target.value } : f)} />
+                  </div>
+                  <div className="form-row">
+                    <label className="form-label">Language</label>
+                    <input className="form-input" value={form.language}
+                      onChange={e => setForm(f => f ? { ...f, language: e.target.value } : f)} />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <label className="form-label">Description</label>
+                  <textarea className="form-input form-textarea" value={form.description}
+                    onChange={e => setForm(f => f ? { ...f, description: e.target.value } : f)} />
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="editor-footer">
+            <button className="btn-outline" onClick={onClose}>Cancel</button>
+            <button className="btn-primary" onClick={handleSave} disabled={isSaving || !form}>
+              {isSaving ? 'Saving…' : 'Save'}
+            </button>
+          </div>
         </div>
 
-        <div className="editor-footer">
-          <button className="btn-secondary" onClick={onClose}>Cancel</button>
-          <button className="btn-primary" onClick={handleSave} disabled={isSaving || !form}>
-            {isSaving ? 'Saving…' : 'Save Changes'}
-          </button>
+        {/* Right pane — search */}
+        <div className="editor-right">
+          <p className="editor-eyebrow" style={{ margin: 0 }}>Search metadata</p>
+
+          <div className="editor-search-bar">
+            <Search size={13} color="var(--fg-muted)" />
+            <input
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Title · Author"
+              onKeyDown={e => { if (e.key === 'Enter') handleSearch(); }}
+            />
+            <button className="editor-search-btn" onClick={handleSearch} disabled={isSearching}>
+              {isSearching ? '…' : <Search size={13} />}
+            </button>
+          </div>
+
+          <div className="provider-pills">
+            <button className="provider-pill active">Open Library ✓</button>
+            <button className="provider-pill active">Google Books ✓</button>
+          </div>
+
+          {hasSearched && !searchError && (
+            <p className="search-result-count">
+              {searchResults.length} result{searchResults.length !== 1 ? 's' : ''} · ranked by match
+            </p>
+          )}
+          {searchError && <p className="search-feedback search-feedback-error">{searchError}</p>}
+          {hasSearched && !searchError && searchResults.length === 0 && (
+            <p className="search-feedback">No results. Try a shorter title.</p>
+          )}
+          {!hasSearched && !isSearching && (
+            <p className="search-feedback">Search to pull metadata from Open Library and Google Books.</p>
+          )}
+
+          <div className="search-results">
+            {searchResults.map((r, i) => (
+              <ResultCard
+                key={i}
+                result={r}
+                selected={selectedResult === r}
+                onSelect={() => handleSelectResult(r)}
+              />
+            ))}
+          </div>
+
+          <div className="editor-apply-footer">
+            <button
+              className="btn-primary"
+              style={{ width: '100%', justifyContent: 'center' }}
+              disabled={!selectedResult}
+              onClick={() => { /* already applied on select */ onClose(); }}
+            >
+              Apply selected →
+            </button>
+          </div>
         </div>
       </motion.div>
     </motion.div>
+  );
+}
+
+function ResultCard({ result, selected, onSelect }: {
+  result: ExternalBookMetadataDto;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  const [imgError, setImgError] = useState(false);
+  const quality = matchQuality(result);
+
+  return (
+    <button
+      className={`search-result-item${selected ? ' selected' : ''}`}
+      onClick={onSelect}
+    >
+      {result.coverUrl && !imgError ? (
+        <img
+          className="result-thumb"
+          src={result.coverUrl}
+          alt=""
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <div className="result-thumb-fallback" />
+      )}
+      <div className="result-info">
+        <p className="result-title">{result.title ?? '—'}</p>
+        <p className="result-meta">
+          {result.authors.slice(0, 2).join(', ')}{result.publishedDate ? ` · ${result.publishedDate.slice(0, 4)}` : ''}
+        </p>
+        <div className="result-pills">
+          <span className={`result-pill result-pill-match`}>{quality}</span>
+        </div>
+      </div>
+    </button>
   );
 }
 
@@ -386,17 +392,5 @@ function TagInput({ tags, onChange }: { tags: string[]; onChange: (tags: string[
         onBlur={() => { if (inputValue.trim()) addTag(inputValue); }}
       />
     </div>
-  );
-}
-
-function FieldCheck({ label, value, checked, onChange }: {
-  label: string; value: string; checked: boolean; onChange: (v: boolean) => void;
-}) {
-  return (
-    <label className="field-check-row">
-      <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} />
-      <span style={{ minWidth: 80, color: 'var(--text-muted)', fontSize: 11 }}>{label}</span>
-      <span className="field-check-value">{value}</span>
-    </label>
   );
 }

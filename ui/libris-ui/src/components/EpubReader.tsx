@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import ePub from 'epubjs';
+import { X } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { getBook } from '../api/books';
 import { getProgress, saveProgress } from '../api/progress';
@@ -12,6 +13,8 @@ interface TocItem {
   label: string;
   subitems?: TocItem[];
 }
+
+const CIRCUMFERENCE = 2 * Math.PI * 28;
 
 export function EpubReader() {
   const openBookId = useLibrisStore(s => s.openBookId);
@@ -29,10 +32,10 @@ export function EpubReader() {
 
   const [toc, setToc] = useState<TocItem[]>([]);
   const tocRef = useRef<TocItem[]>([]);
-  const [tocOpen, setTocOpen] = useState(false);
   const [currentChapter, setCurrentChapter] = useState('');
   const [progress, setProgress] = useState(0);
   const [fontSize, setFontSize] = useState(100);
+  const [orbOpen, setOrbOpen] = useState(false);
 
   const { data: bookDetail } = useQuery({
     queryKey: ['book', openBookId],
@@ -40,9 +43,7 @@ export function EpubReader() {
     enabled: openBookId !== null,
   });
 
-  useEffect(() => {
-    openBookIdRef.current = openBookId;
-  }, [openBookId]);
+  useEffect(() => { openBookIdRef.current = openBookId; }, [openBookId]);
 
   const flushProgress = () => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -63,23 +64,58 @@ export function EpubReader() {
     bookRef.current = book;
 
     const rendition = book.renderTo(containerRef.current, {
+      manager: 'continuous',
+      flow: 'scrolled',
       width: '100%',
       height: '100%',
-      spread: 'none',
       allowScriptedContent: true,
     });
     renditionRef.current = rendition;
+
+    rendition.themes.register('libris', {
+      'html, body': {
+        'background': '#0c0c10 !important',
+        'color': 'rgba(232,230,223,0.85) !important',
+      },
+      // Force all elements to inherit the body color so epub-specific
+      // inline styles and element-level rules can't bleed through as dark text.
+      '*': {
+        'color': 'inherit !important',
+      },
+      'body': {
+        'font-family': '"Source Serif 4", Georgia, serif !important',
+        'font-size': '15px !important',
+        'line-height': '1.7 !important',
+        'max-width': '580px',
+        'margin': '0 auto !important',
+        'padding': '70px 24px 140px !important',
+      },
+      'h1, h2, h3, h4': {
+        'font-family': '"Inter", system-ui, sans-serif !important',
+      },
+      'p': { 'margin': '0 0 14px !important' },
+      'img': { 'max-width': '100% !important', 'height': 'auto !important' },
+      'a': { 'color': '#c96442 !important' },
+    });
+    rendition.themes.select('libris');
 
     book.loaded.navigation.then((nav: { toc: TocItem[] }) => {
       setToc(nav.toc);
       tocRef.current = nav.toc;
     });
 
-    book.ready.then(() => {
-      book.locations.generate(1024);
+    // Generate locations then immediately refresh progress from current position.
+    // percentage is always 0 until locations are ready.
+    book.ready.then(async () => {
+      await book.locations.generate(1024);
+      const loc = renditionRef.current?.currentLocation();
+      if (loc?.start?.cfi) {
+        const pct = Math.round((loc.start.percentage ?? 0) * 100);
+        setProgress(pct);
+        lastLocationRef.current = { cfi: loc.start.cfi, percentage: loc.start.percentage ?? 0 };
+      }
     });
 
-    // Resume from saved CFI or start from beginning
     getProgress(openBookId)
       .then(p => {
         if (p?.currentCfi) {
@@ -88,14 +124,13 @@ export function EpubReader() {
           rendition.display().catch(console.error);
         }
       })
-      .catch(() => {
-        rendition.display().catch(console.error);
-      });
+      .catch(() => { rendition.display().catch(console.error); });
 
+    // relocated fires on spine-item changes — good for chapter tracking.
     rendition.on('relocated', (location: { start: { cfi: string; percentage: number; href: string } }) => {
-      const pct = Math.round((location.start?.percentage ?? 0) * 100);
       const cfi = location.start?.cfi ?? '';
       const href = location.start?.href ?? '';
+      const pct = Math.round((location.start?.percentage ?? 0) * 100);
 
       setProgress(pct);
       setCurrentChapter(findChapterLabel(tocRef.current, href));
@@ -105,6 +140,21 @@ export function EpubReader() {
       debounceRef.current = setTimeout(() => {
         saveProgress(openBookId, cfi, location.start?.percentage ?? 0).catch(() => {});
       }, 2000);
+    });
+
+    // Continuous manager creates a single scrollable stage div as the first child
+    // of our container. Attach one scroll listener to it after first render.
+    rendition.on('rendered', () => {
+      const stage = containerRef.current?.firstElementChild as HTMLElement | null;
+      if (!stage || stage.dataset.librisScroll) return;
+      stage.dataset.librisScroll = '1';
+      stage.addEventListener('scroll', () => {
+        const loc = renditionRef.current?.currentLocation();
+        if (!loc?.start?.cfi) return;
+        const pct = Math.round((loc.start.percentage ?? 0) * 100);
+        setProgress(pct);
+        lastLocationRef.current = { cfi: loc.start.cfi, percentage: loc.start.percentage ?? 0 };
+      }, { passive: true });
     });
 
     return () => {
@@ -121,7 +171,6 @@ export function EpubReader() {
     renditionRef.current?.themes.fontSize(`${fontSize}%`);
   }, [fontSize]);
 
-  // Save on page unload (WPF window close)
   useEffect(() => {
     const handler = () => {
       const id = openBookIdRef.current;
@@ -140,108 +189,134 @@ export function EpubReader() {
     return () => window.removeEventListener('beforeunload', handler);
   }, []);
 
+  useEffect(() => {
+    if (!readerVisible) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { e.stopPropagation(); handleClose(); }
+    };
+    window.addEventListener('keydown', handler, true);
+    return () => window.removeEventListener('keydown', handler, true);
+  }, [readerVisible]);
+
   const handleClose = () => {
     flushProgress();
     setReaderVisible(false);
-    setTocOpen(false);
+    setOrbOpen(false);
   };
+
+  const arcOffset = CIRCUMFERENCE * 0.25;
+  const arcDash = CIRCUMFERENCE * (progress / 100);
 
   return (
     <AnimatePresence>
       {readerVisible && openBookId && (
         <motion.div
           className="reader-overlay"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.18 }}
+          initial={{ y: '100%', opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: '100%', opacity: 0 }}
+          transition={{ duration: 0.26, ease: 'easeOut' }}
         >
-          {/* TOC sidebar */}
+          {/* Reading area — epub.js owns this div entirely */}
+          <div className="reader-content" ref={containerRef} />
+
+          {/* Floating close pill */}
+          <button className="reader-close-pill" onClick={handleClose}>
+            <X size={13} />
+            Close
+          </button>
+
+          {/* Floating progress orb */}
+          <button
+            className="reader-orb"
+            onClick={() => setOrbOpen(o => !o)}
+            aria-label="Reading progress and settings"
+          >
+            <svg
+              className="reader-orb-svg"
+              width="64"
+              height="64"
+              viewBox="0 0 64 64"
+            >
+              {/* Dashed track */}
+              <circle
+                cx="32" cy="32" r="28"
+                stroke="rgba(232,230,223,0.18)"
+                strokeWidth="1.4"
+                fill="none"
+                strokeDasharray="2 3"
+              />
+              {/* Accent arc */}
+              {progress > 0 && (
+                <circle
+                  cx="32" cy="32" r="28"
+                  stroke="#c96442"
+                  strokeWidth="2.6"
+                  fill="none"
+                  strokeDasharray={`${arcDash} ${CIRCUMFERENCE}`}
+                  strokeDashoffset={arcOffset}
+                  transform="rotate(-90 32 32)"
+                  strokeLinecap="round"
+                />
+              )}
+            </svg>
+            <div className="reader-orb-inner">
+              <span className="reader-orb-pct">{progress}%</span>
+            </div>
+          </button>
+
+          {/* Bottom whisper */}
+          <div className="reader-whisper">
+            {bookDetail?.title ?? ''}{currentChapter ? ` · ${currentChapter}` : ''}
+          </div>
+
+          {/* Orb popover */}
           <AnimatePresence>
-            {tocOpen && (
-              <motion.nav
-                className="reader-toc"
-                initial={{ x: '-100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '-100%' }}
-                transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            {orbOpen && (
+              <motion.div
+                className="reader-orb-popover"
+                initial={{ opacity: 0, scale: 0.95, y: 8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 8 }}
+                transition={{ duration: 0.15 }}
               >
-                <p className="toc-heading">Contents</p>
-                <ul className="toc-list">
-                  {toc.map(item => (
-                    <li key={item.id}>
-                      <button
-                        className="toc-item"
-                        onClick={() => {
-                          renditionRef.current?.display(item.href);
-                          setTocOpen(false);
-                        }}
-                      >
-                        {item.label.trim()}
-                      </button>
-                      {item.subitems?.map(sub => (
-                        <button
-                          key={sub.id}
-                          className="toc-item toc-item-sub"
-                          onClick={() => {
-                            renditionRef.current?.display(sub.href);
-                            setTocOpen(false);
-                          }}
-                        >
-                          {sub.label.trim()}
-                        </button>
+                {toc.length > 0 && (
+                  <div className="orb-popover-section">
+                    <p className="orb-popover-label">Contents</p>
+                    <ul className="toc-list">
+                      {toc.map(item => (
+                        <li key={item.id}>
+                          <button
+                            className="toc-item"
+                            onClick={() => { renditionRef.current?.display(item.href); setOrbOpen(false); }}
+                          >
+                            {item.label.trim()}
+                          </button>
+                          {item.subitems?.map(sub => (
+                            <button
+                              key={sub.id}
+                              className="toc-item toc-item-sub"
+                              onClick={() => { renditionRef.current?.display(sub.href); setOrbOpen(false); }}
+                            >
+                              {sub.label.trim()}
+                            </button>
+                          ))}
+                        </li>
                       ))}
-                    </li>
-                  ))}
-                </ul>
-              </motion.nav>
+                    </ul>
+                  </div>
+                )}
+                <div className="orb-popover-section" style={{ marginBottom: 0 }}>
+                  <p className="orb-popover-label">Text size</p>
+                  <div className="font-size-row">
+                    <button className="font-size-btn" onClick={() => setFontSize(f => Math.max(70, f - 10))}>A−</button>
+                    <span className="font-size-value">{fontSize}%</span>
+                    <button className="font-size-btn" onClick={() => setFontSize(f => Math.min(200, f + 10))}>A+</button>
+                  </div>
+                </div>
+              </motion.div>
             )}
           </AnimatePresence>
-
-          {/* Top chrome */}
-          <div className="reader-chrome">
-            <div className="chrome-left">
-              <button className="chrome-btn" onClick={() => setTocOpen(o => !o)} title="Table of Contents">
-                ☰
-              </button>
-            </div>
-            <div className="chrome-center">
-              <span className="chrome-title">{bookDetail?.title ?? ''}</span>
-              {currentChapter && (
-                <span className="chrome-chapter"> — {currentChapter}</span>
-              )}
-            </div>
-            <div className="chrome-right">
-              <button className="chrome-btn" onClick={() => setFontSize(f => Math.max(70, f - 10))} title="Decrease font size">
-                A-
-              </button>
-              <button className="chrome-btn" onClick={() => setFontSize(f => Math.min(200, f + 10))} title="Increase font size">
-                A+
-              </button>
-              <button className="chrome-btn chrome-close" onClick={handleClose} title="Close reader">
-                ✕
-              </button>
-            </div>
-          </div>
-
-          {/* Reading area */}
-          <div className="reader-body">
-            <button className="reader-nav reader-nav-prev" onClick={() => renditionRef.current?.prev()}>
-              ‹
-            </button>
-            <div className="reader-content" ref={containerRef} />
-            <button className="reader-nav reader-nav-next" onClick={() => renditionRef.current?.next()}>
-              ›
-            </button>
-          </div>
-
-          {/* Progress bar */}
-          <div className="reader-progress-wrap">
-            <div className="reader-progress-track">
-              <div className="reader-progress-fill" style={{ width: `${progress}%` }} />
-            </div>
-            <span className="reader-progress-label">{progress}%</span>
-          </div>
         </motion.div>
       )}
     </AnimatePresence>

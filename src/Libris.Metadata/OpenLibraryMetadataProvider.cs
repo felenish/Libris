@@ -100,6 +100,10 @@ public sealed class OpenLibraryMetadataProvider(HttpClient http) : IMetadataProv
             && fy.ValueKind == JsonValueKind.Number)
             year = fy.GetInt32().ToString();
 
+        string? coverUrl = null;
+        if (e.TryGetProperty("cover_i", out var coverId) && coverId.ValueKind == JsonValueKind.Number)
+            coverUrl = $"https://covers.openlibrary.org/b/id/{coverId.GetInt32()}-M.jpg";
+
         return new ExternalBookMetadata
         {
             ProviderName = ProviderName,
@@ -109,6 +113,7 @@ public sealed class OpenLibraryMetadataProvider(HttpClient http) : IMetadataProv
             Publisher = publisher,
             PublishedDate = year,
             Genres = subjects,
+            CoverUrl = coverUrl,
         };
     }
 

@@ -19,7 +19,9 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\ScottMorgan\\\\.nuget\\\\packages\\\\versone.epub\\\\3.3.6\\\\\" -Recurse -File | Select-Object -ExpandProperty FullName | head -30)",
       "Bash(npm run *)",
       "Bash(npx vite *)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(powershell -Command \"\\(Get-Content uitasks.md\\) -replace '\\\\- \\\\[ \\\\]', '- [x]' | Set-Content uitasks.md -Encoding utf8\")"
     ]
   }
 }

@@ -28,6 +28,10 @@ public partial class MainWindow : Window
         CoreWebView2Environment env = await CoreWebView2Environment.CreateAsync(userDataFolder: userDataFolder);
         await WebView.EnsureCoreWebView2Async(env);
 
+        await WebView.CoreWebView2.Profile.ClearBrowsingDataAsync(
+            CoreWebView2BrowsingDataKinds.DiskCache |
+            CoreWebView2BrowsingDataKinds.CacheStorage);
+
         WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
         WebView.CoreWebView2.Settings.IsNonClientRegionSupportEnabled = true;
         WebView.CoreWebView2.WebMessageReceived += OnWebMessageReceived;
