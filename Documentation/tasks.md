@@ -63,7 +63,7 @@
 - [x] Implement `CoverCacheManager : ICoverCacheManager` — resize to fit within 400×600 (preserve aspect ratio), save as JPEG 85% quality using `System.Drawing`
 - [x] Target `net10.0-windows` in `Libris.Storage` — unlocks `System.Drawing` (GDI+), no external image package needed
 - [x] Create initial EF Core migration (`InitialCreate`)
-- [ ] Apply migration programmatically on startup (`context.Database.MigrateAsync()`)
+- [x] Apply migration programmatically on startup (`context.Database.MigrateAsync()`)
 - [x] Write `LibrisDataPaths` unit test
 
 ---
@@ -98,20 +98,20 @@
 
 ## Phase 6 — WPF Shell + WebView2
 
-- [ ] Add `App.xaml` and `App.xaml.cs` to `Libris.Desktop`
-- [ ] Implement `GetAvailablePort()` — binds to port 0, reads assigned port, releases
-- [ ] Implement `BuildApi(int port)` — full DI registration, Kestrel URL, static files, fallback route
-- [ ] Register `LibrisDbContext` with SQLite connection string pointing to `LibrisDataPaths.DatabasePath`
-- [ ] Register all repositories, services, and providers
-- [ ] Call `context.Database.MigrateAsync()` before starting Kestrel
-- [ ] Implement `MainWindow.xaml` — single `WebView2` control, `AllowsTransparency=False`, no chrome customization for MVP
-- [ ] Implement `MainWindow.xaml.cs` — initialize WebView2, navigate to correct URL based on `#if DEBUG`
-- [ ] Implement `WpfShellService : IShellService` — `Dispatcher.InvokeAsync` for all dialog calls
-- [ ] `OpenFileDialogAsync` — filter `*.epub`, multi-select enabled
-- [ ] `OpenFolderDialogAsync` — folder browser dialog
-- [ ] `RevealInExplorerAsync` — `Process.Start("explorer.exe", $"/select,\"{path}\"")`
-- [ ] Load and save window state (bounds, `WindowState`) to `settings.json` via `System.Text.Json`
-- [ ] `OnExit` — stop Kestrel gracefully with `_api.StopAsync()`
+- [x] Add `App.xaml` and `App.xaml.cs` to `Libris.Desktop`
+- [x] Implement `GetAvailablePort()` — binds to port 0, reads assigned port, releases
+- [x] Implement `BuildApi(int port)` — full DI registration, Kestrel URL, static files, fallback route
+- [x] Register `LibrisDbContext` with SQLite connection string pointing to `LibrisDataPaths.DatabasePath`
+- [x] Register all repositories, services, and providers
+- [x] Call `context.Database.MigrateAsync()` before starting Kestrel
+- [x] Implement `MainWindow.xaml` — single `WebView2` control, `AllowsTransparency=False`, no chrome customization for MVP
+- [x] Implement `MainWindow.xaml.cs` — initialize WebView2, navigate to correct URL based on `#if DEBUG`
+- [x] Implement `WpfShellService : IShellService` — `Dispatcher.InvokeAsync` for all dialog calls
+- [x] `OpenFileDialogAsync` — filter `*.epub`, multi-select enabled
+- [x] `OpenFolderDialogAsync` — folder browser dialog
+- [x] `RevealInExplorerAsync` — `Process.Start("explorer.exe", $"/select,\"{path}\"")`
+- [x] Load and save window state (bounds, `WindowState`) to `settings.json` via `System.Text.Json`
+- [x] `OnExit` — stop Kestrel gracefully with `_api.StopAsync()`
 - [ ] Verify WebView2 loads Vite dev server page in debug mode without errors
 
 ---
